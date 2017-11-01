@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<conio.h>
 #include<string.h>
+#include<time.h>
 struct node
 {
 	char sym;
@@ -56,6 +57,95 @@ void shannon(int l,int h,node s[])
 		shannon(k+1,h,s);
 	}
 }
+int encode(char filename1[25],char filename2[25])
+	{
+		FILE *infile, *outfile;
+		char ch;
+		int i,j,orignal=0,after=0,compressed;
+		infile = fopen(filename1, "r");
+		outfile= fopen(filename2,"w");
+		ch = fgetc(infile); 
+    	while (ch != EOF)
+    	{
+        	orignal++;
+			if (ch >=' ' && ch <= '~') 
+			{			
+				for(i=0;i<95;i++)
+				{
+					if(ch==s[i].sym)
+					{
+						for(j=0;j<=s[i].top;j++)
+						{
+							fprintf(outfile,"%d",s[i].arr[j]);
+							after++;
+						}
+						fprintf(outfile," ");
+						after++;
+						break;		
+					}
+				}
+			}
+        	ch = fgetc(infile);
+    	}
+    	fclose(infile);
+    	fclose(outfile);
+    	orignal=orignal*8;
+    	compressed=orignal-after;
+    	printf("\nOrignal bits->%d\nBits after Compression->%d\nBits Saved->%d\n",orignal,after,compressed);
+    	
+    	return 0;
+	}
+int decode(char filename2[25])
+{
+	FILE *infile, *outfile;
+	char ch;
+	char filename1[25];
+	int ar[20];
+	int i,j,k,l,m=0;
+    infile = fopen(filename2, "r");
+    printf("Enter the filename for output \n");
+    scanf("%s", filename1);
+	outfile= fopen(filename1,"w");
+	ch = fgetc(infile); 
+    while(m==0)
+		{
+			i=0;
+			while (ch !=' ')
+    			{
+    				ar[i]=ch-48;
+					i++;
+        			ch = fgetc(infile);
+    			}
+  			ch=fgetc(infile);
+  			for(j=tn;j>0;j--)
+			  {
+			  	for(k=0;k<i;k++)
+				  {
+				  	if(ar[k]==s[j].arr[k]){
+			  		  l=1;
+				  	}
+			  		else{
+					  l=0;
+					  break;
+					  }	
+				  }
+				 if(l==1)
+				 {
+				 	fprintf(outfile,"%c",s[j].sym);
+				 	break;
+				 }
+			  }
+			 if(ch==EOF)
+			 	m=1; 
+   	
+    	}
+ 	fclose(infile);
+   	fclose(outfile);
+    	
+
+
+return 0;
+}
 int main()
 {
 	FILE *infile;
@@ -65,6 +155,8 @@ int main()
 	char ch;
 	char filename1[25],filename2[25];
 	node temp;
+    clock_t start,end;
+	double cpu_time_used;
     
     LOOP:
 	printf("1.compress\t2.decompress\t3. exit\n");
@@ -85,7 +177,8 @@ int main()
         printf("Cannot open file \n");
         exit(0);
     }
-    ch = fgetc(infile); 
+    start=clock();
+	ch = fgetc(infile); 
     while (ch != EOF)
     {
         if (ch >=' ' && ch <= '~') 
@@ -137,90 +230,10 @@ int main()
 	}
 	printf("\n---------------------------------------------------------------\n");
 	encode(filename1, filename2);
+	end=clock();
+	cpu_time_used=((double)(end-start))/CLOCKS_PER_SEC;
+	printf("time taken is %f\n",cpu_time_used);
 	goto LOOP;
 	getch();
 	return 0;
-}
-int encode(char filename1[25],char filename2[25])
-	{
-		FILE *infile, *outfile;
-		char ch;
-		int i,j;
-		infile = fopen(filename1, "r");
-		outfile= fopen(filename2,"w");
-		ch = fgetc(infile); 
-    	while (ch != EOF)
-    	{
-        	if (ch >=' ' && ch <= '~') 
-			{			
-				for(i=0;i<95;i++)
-				{
-					if(ch==s[i].sym)
-					{
-						for(j=0;j<=s[i].top;j++)
-						{
-							fprintf(outfile,"%d",s[i].arr[j]);
-						}
-						fprintf(outfile," ");
-						break;		
-					}
-				}
-			}
-        	ch = fgetc(infile);
-    	}
-    	fclose(infile);
-    	fclose(outfile);
-    	
-    	return 0;
-	}
-int decode(char filename2[25])
-{
-	FILE *infile, *outfile;
-	char ch;
-	char filename1[25];
-	int ar[20];
-	int i,j,k,l,m=0;
-    infile = fopen(filename2, "r");
-    printf("Enter the filename for output \n");
-    scanf("%s", filename1);
-	outfile= fopen(filename1,"w");
-	ch = fgetc(infile); 
-    while(m==0)
-		{
-			i=0;
-			while (ch !=' ')
-    			{
-    				ar[i]=ch-48;
-					i++;
-        			ch = fgetc(infile);
-    			}
-  			ch=fgetc(infile);
-	  		for(j=tn;j>0;j--)
-			  {
-			  	for(k=0;k<i;k++)
-				  {
-				  	if(ar[k]==s[j].arr[k]){
-			  		  l=1;
-				  	}
-			  		else{
-					  l=0;
-  					   break;
-					  }	
-				  }
-				 if(l==1)
-				 {
-				 	fprintf(outfile,"%c",s[j].sym);
-				 	break;
-				 }
-			  }
-			 if(ch==EOF)
-			 	m=1; 
-   	
-    	}
- 	fclose(infile);
-   	fclose(outfile);
-    	
-
-
-return 0;
 }
