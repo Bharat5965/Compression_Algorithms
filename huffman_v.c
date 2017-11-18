@@ -22,8 +22,6 @@ node new_node(int freq, char c, node a, node b)
 	}
 	return n;
 }
- 
-/* priority queue */
 void qinsert(node n)
 {
 	int j, i = qend++;
@@ -49,7 +47,6 @@ node qremove()
 	return n;
 }
  
-/* walk the tree and put 0s and 1s */
 void build_code(node n, char *s, int len)
 {
 	static char *out = buf;
